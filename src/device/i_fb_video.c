@@ -51,7 +51,7 @@ void I_InitGraphics (void)
             exit(4);
     }
     printf("The framebuffer device was mapped to memory successfully.\n");
-
+        
 }
 
 
@@ -107,6 +107,12 @@ int location(int x, int y)
     return (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) + (y+vinfo.yoffset) * finfo.line_length;
 }
 
+uint16_t colorTo16bit(struct Color col)
+{
+    return  (col.r >> 3) << 11 | (col.g >> 2) << 5 | (col.b >> 3);
+    //return (col.b & 0x1F) << 10 | (col.g & 0x1F) << 5 | (col.r & 0x1F);
+}
+
 void I_FinishUpdate (void)
 {
     for (int gy=0; gy<SCREENHEIGHT; gy++)
@@ -114,7 +120,14 @@ void I_FinishUpdate (void)
         for (int gx=0; gx<SCREENWIDTH; gx++)
         {
             int fbPos = location(gx,gy);
-            *((uint32_t*)(fbp+fbPos + 0)) = colors[*(screens[0]+gy*SCREENWIDTH+gx)].raw;
+            if (vinfo.bits_per_pixel == 32)
+            {
+                *((uint32_t*)(fbp+fbPos + 0)) = colors[*(screens[0]+gy*SCREENWIDTH+gx)].raw;
+            }
+            else if (vinfo.bits_per_pixel == 16)
+            {
+                *((uint16_t*)(fbp+fbPos)) = colorTo16bit(colors[*(screens[0]+gy*SCREENWIDTH+gx)].col);
+            }
         }
     }
 }

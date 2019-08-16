@@ -1,5 +1,5 @@
 CXX=g++
-CC=gcc
+CC=aarch64-linux-gnu-gcc
 
 SOURCES = $(patsubst src/%, %, $(wildcard src/*.c))
 SOURCES += device/main.c device/i_fb_video.c device/i_no_sound.c device/i_no_music.c
